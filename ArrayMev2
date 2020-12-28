@@ -1,0 +1,146 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define menu_cont while ((ch = getchar()) != '\n' && ch != EOF);printf("\n\nPress ENTER to continue.");while ((ch = getchar()) != '\n' && ch != EOF);     //to save space
+
+int search(char toSearch, int size, char const letter[], int* pos){
+    for (int i=0; i<size; i++)
+    {
+        if (letter[i] == toSearch)
+        {
+            *pos = i;
+            return 1;												//found character
+        }
+        else if (i == (size - 1))
+            return 0;												//character not found 
+    }
+}
+
+int delete (char toSearch, int *size, char letters[]){				//Uses an algorithm like search but deletes the searched character and decrements array size by 1
+
+  int i;
+    for (i = 0; i < *size; i++)
+        if (letters[i] == toSearch){
+    for (; i < *size;i++)
+            {
+                letters[i] = letters[i+1];
+                if (i == (*size-1))
+                    letters[i] = '\0';								//disregards the final pos
+            }        
+			*size -= 1;												//size decrements
+            return 1;												//found character
+  	}
+	else if ((i == (*size - 1)))
+  	return 0;														//character not found 
+}
+
+void sort(char letters[], int size){								//we change our sorter from qsort to bubble sort for less complexity.
+	int i, j;
+	char temp;
+	for (i = 0; i < size-1; i++) {									//sorter
+		for (j = i+1; j < size; j++) {
+			if (letters[i] > letters[j]) {							//start of swapper
+				temp = letters[i];									
+				letters[i] = letters[j];
+        		letters[j] = temp;									//end of swapper
+    		}
+		}
+	}
+}
+
+int main(void) 
+{
+	int i ,size = 12, choice, ch, found, pos;
+    char letters[12], toSearch;										//main char letters, toDelete is redundant so we kept the toSearch to lessen code to be used in the delete algorithm.
+    char nl[12][1]; 												//nl for newline(12 rows and 1 column in the file, that is why it is 2-d)
+    FILE *fptr;
+    int j = 0;
+    fptr = fopen("D:INPUT.txt", "r");								//open fike
+    while(fgets(nl[j], 3, fptr))									//It messes the whole thing when it is not three. Maybe it was because of the the character, newline, and the other factor that we don't know yet.
+        j++;
+    for (int size = 0; size < 12; size++)
+        letters[size] = nl[size][0];								//save to array
+    fclose(fptr);													//close file
+	do
+	{
+		printf("\nMenu\n\n");
+		printf("1. Search the Array\n");
+		printf("2. Delete from the Array\n");
+		printf("3. Sort the content of the Array\n");
+		printf("4. Exit\n");
+		printf("Choose by typing the number: \n");
+		if (scanf("%ls", &choice) != 1)
+            break;
+
+
+		switch(choice)												//main menu
+		{
+			case '1': {												//search
+				printf("Input your letter to search: \n");
+                scanf(" %c", &toSearch);
+                printf("\nInput: %c\n", toSearch);
+
+                if (search(toSearch, size, letters, &pos))			//search algorithm
+                    printf("%c found at position %d\n",letters[pos], pos+1);
+                else
+                    printf("Input not found in array\n");
+                    
+            	menu_cont;		
+            }
+				break;
+			case '2': {												//delete
+				printf("Before deletion:\n");
+                for (int i = 0;i < size; i++){
+                    printf("%c ", letters[i]);
+                }
+                printf("\nInput your letter to delete: \n");
+                scanf(" %c", &toSearch);
+                printf("\nLetter to delete: %c\n", toSearch);
+
+                if (delete (toSearch, &size, letters)){				//delete algorithm
+                    printf ("\nAfter Deletion:\n");
+                for (int i = 0; i < size; i++)
+                    printf ("%c ", letters[i]);
+                }
+                else{
+                    printf("\n\nElement %c is not found in the array\n\n", toSearch);;
+                }
+                
+				menu_cont;
+			}
+				break;
+			case '3': {												//sort
+				printf("\nBefore sorting:\n");
+        			for (int i = 0;i<12;i++)  {
+            			printf("%c ", letters[i]);
+   				}
+			    printf("\n");
+   				sort(letters, size);								//sort algorithm
+				printf("\nSorted Array:\n");
+				for (i = 0; i < 12; i++)
+					printf("%c ", letters[i]);
+				printf("\n");
+				
+				menu_cont;
+			}
+				break;
+			case '4': printf("Quitting program!\n");{				//quit and save
+				FILE * save = NULL;
+				save = fopen("D:OUTPUT.txt", "w");					//open output.txt
+				fprintf(save,"Array Me! ver 2.0 project by Jeremy D. Jimenez and Marwin O. Matic\n");					//start printing in file
+				for (int i = 0; i < size; i++)
+					fprintf(save,"%c ",letters[i]);	
+				fclose(save);										//close output.txt
+				break;
+			}
+				exit(0);
+				break;
+			default: printf("Invalid input!\n");
+                break;
+		}
+
+	} while (choice!= '4');
+	
+	return 0;
+}
