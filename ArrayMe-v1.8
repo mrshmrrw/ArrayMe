@@ -1,0 +1,174 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 3
+
+int delete (char toDelete, int *size, char* letters[]){
+
+  int found;
+  int pos;
+  int i;
+    for (i = 0; i < *size; i++)
+        if (letters[i] == toDelete){
+            found = 1;
+            pos = i;
+    }
+
+    if (found == 1){
+        for (i = pos; i < *size; i++)
+          letters[i] = letters[i + 1];
+             *size = *size - 1;
+  }
+
+else if ((i == (*size - 1)))
+  return 0;
+}
+
+int main() {
+
+    char *loadfile = "D:INPUT.txt";
+    char *savefile = "D:OUTPUT.txt";
+    char temp[MAX], toSearch, toDelete;
+    char **letters = NULL; // The main char string array
+    int i, j, choice, ch, found;
+    int size = 0;
+
+    FILE * load = NULL;
+    FILE * save = NULL;
+
+    if ( (load = fopen(loadfile, "r")) == NULL ) {
+        fprintf(stderr,"Error: Could not open %s\n",loadfile);
+        return 1;
+    }
+    if ( (save = fopen(savefile, "w")) == NULL ) {
+        fprintf(stderr,"Error: Could not open %s\n",savefile);
+        return 1;
+    }
+
+    while(fgets(temp, MAX, load) != NULL) {									// Read and store in a string list.
+        if(strchr(temp,'\n'))												// Removing the trailing newline character
+            temp[strlen(temp)-1] = '\0';
+        letters = (char**)realloc(letters, sizeof(char**)*(size+1));
+        letters[size] = (char*)calloc(MAX,sizeof(char));
+        strcpy(letters[size], temp);
+        size++;
+    }
+    // Sort the array.
+    printf("Opening INPUT.txt\n");
+	for(i = 0; i < size; i++)
+		printf("%s ", letters[i]);
+	do
+	{
+		printf("\nMenu\n\n");
+		printf("1. Search the Array\n");
+		printf("2. Delete from the Array\n");
+		printf("3. Sort the content of the Array\n");
+		printf("4. Exit\n");
+		printf("Choose by typing the number: \n");
+		if (scanf("%s", &choice) != 1)
+            break;
+
+
+		switch(choice)
+		{
+			case '1': {
+
+    		printf("Input your letter to search:\n");
+        	scanf(" %c", &toSearch);
+
+    		found = 0;
+
+			    for(i=0; i < size; i++){
+
+    			    if (letters[i] == toSearch){
+
+            			found = 1;
+           			break;
+    			    }
+    			}
+
+			    if(found == 1){
+
+        			printf("\nInput : %c\n", toSearch);
+        			printf("%c found at position %d", toSearch, i+1);
+    			}
+
+    			else{
+
+    			    printf("Input not found in the array.");
+    			}
+
+            	while ((ch = getchar()) != '\n' && ch != EOF) ;
+				printf("\n\nPress ENTER to continue.");
+				while ((ch = getchar()) != '\n' && ch != EOF) ;
+            }
+				break;
+			case '2': {
+                    printf("Before deletion:\n");
+                for (int i = 0;i < size; i++){
+                    printf("%c ", letters[i]);
+                }
+                printf("\nInput your letter to delete: \n");
+                scanf(" %c", &toDelete);
+                printf("\nLetter to delete: %c\n", toDelete);
+
+                if (delete (toDelete, &size, letters)){
+                    printf ("\nAfter Deletion:\n");
+                for (int i = 0; i < size; i++)
+                    printf ("%c ", letters[i]);
+                }
+                else{
+                    printf("\n\nElement %c is not found in the array\n\n", toDelete);;
+                };
+				while ((ch = getchar()) != '\n' && ch != EOF) ;
+				printf("\n\nPress ENTER to continue.");
+				while ((ch = getchar()) != '\n' && ch != EOF) ;
+            }
+				break;
+			case '3': {
+				sort(letters,size);
+				for(i = 0; i < size; i++)
+					printf("%s ", letters[i]);
+				
+				while ((ch = getchar()) != '\n' && ch != EOF) ;
+				printf("\n\nPress ENTER to continue.");
+				while ((ch = getchar()) != '\n' && ch != EOF) ;
+			}
+				break;
+			case '4': printf("Quitting program!\n");
+			for(i = 0; i < size; i++)
+        	fprintf(save,"%s ",letters[i]);
+    			// free each string
+    		for(i = 0; i < size; i++)
+        		free(letters[i]);
+    			// free string list.
+    			free(letters);
+    			fclose(load);
+    			fclose(save);
+				exit(0);
+				break;
+			default: printf("Invalid input!\n");
+                break;
+		}
+
+	} while (choice!= '4');
+;
+	return 0;
+}
+
+void sort(char* letters[], int size)
+{
+	char* temp;
+	int i, j;
+	for(i= 0; i < (size - 1); ++i) {
+        for(j = 0; j < ( size - i - 1); ++j) {
+            if(strcmp(letters[j], letters[j+1]) > 0) {
+                strcpy(temp, letters[j]);
+                strcpy(letters[j], letters[j+1]);
+                strcpy(letters[j+1], temp);
+            }
+        }
+    }
+}
+
